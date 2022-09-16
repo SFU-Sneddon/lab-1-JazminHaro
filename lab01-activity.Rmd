@@ -20,8 +20,8 @@ knitr::opts_chunk$set(echo = TRUE)
 The following code will ensure you have the necessary proxy settings in your ssh config. It also creates a symbolic link (like a shortcut) to the directory that contains the course files. If this is nonsense to you, don't worry about it and just read on. *If you are running this file for the second+ time, then you need to comment out these lines by adding # at the start of both of them.*
 
 ```{bash}
-mkdir ~/MBB243/
-ln -s /local-scratch/course_files/MBB243/ ~/files
+#mkdir ~/MBB243/
+#ln -s /local-scratch/course_files/MBB243/ ~/files
 ```
 
 The first run of the code chunk above (or the first time you knit this document) should automatically generate a link to the folder that contains all of the files required for our course this semester. You don't have to worry about what this is doing, but we do need this section in here for the first run.
@@ -46,11 +46,12 @@ Each RStudio user is given a home directory on the course server under `/localho
 Add R code and Bash code to the two empty code blocks below, respectively, to print out your current working directory. Add a comment to one of the code blocks that is just the full path to your home directory similar to the examples above.
 
 ```{r}
-
+getwd()
+#/localhome/jch6
 ```
 
 ```{bash, engine.opts='-l'}
-
+pwd 
 ```
 ## Other extremely useful bash commands
 
@@ -72,9 +73,9 @@ Add R code and Bash code to the two empty code blocks below, respectively, to pr
 Let's revisit some of the commands you saw used in class individually. The code below runs the same command and either prints the result out or stores it in a file. You can view the contents of the new file either in the file explorer in Rstudio or at the Terminal (e.g. using `cat`). 
 
 **Task** 
-* Duplicate the last line in this code chunk and modify it by replacing the single `>` with `>>`. What happens when you rerun it? 
+* Duplicate the last line in this code chunk and modify it by replacing the single `>` with `>>`. What happens when you rerun it? The list of 25 lines gets directed twice to the file, increasing the file size from 591 B to 1.2 kB. 
 
-* What happens if you change the output file name (after `>>`) to `~/MBB243/out/genotype_head.txt`? Why do you think that is?
+* What happens if you change the output file name (after `>>`) to `~/MBB243/out/genotype_head.txt`? Why do you think that is? The list's duplicate is not printed out nor stored. The folder "OUT" does not exist in the directory so the file or list cannot be stored there. 
 
 ```{bash, engine.opts='-l'}
 head -n 25 /local-scratch/course_files/MBB243/Sneddon_genotypes.txt
@@ -85,10 +86,11 @@ head -n 25 /local-scratch/course_files/MBB243/Sneddon_genotypes.txt
 # You can save the output you see by "redirecting" STDOUT to a file. 
 
 head -n 25 /local-scratch/course_files/MBB243/Sneddon_genotypes.txt > ~/MBB243/genotype_head.txt
+#head -n 25 /local-scratch/course_files/MBB243/Sneddon_genotypes.txt >> ~/MBB243/out/genotype_head.txt
 
 ```
 
-You should have a few lines of genotype information in a new file named `~/MBB243/genotype_head.txt`. Do you notice any genotypes in there that look "off"? Assuming we wanted to sanity check this whole file for what genotypes exist, we can use a combination the `cut`, `uniq` and `sort` commands (uniq is dumb and only works properly if its input is sorted). The code chunk below does this but uses our smaller file as input for efficiency. The result should be all unique genotypes in that file. What did we do wrong? 
+You should have a few lines of genotype information in a new file named `~/MBB243/genotype_head.txt`. Do you notice any genotypes in there that look "off"? Assuming we wanted to sanity check this whole file for what genotypes exist, we can use a combination the `cut`, `uniq` and `sort` commands (uniq is dumb and only works properly if its input is sorted). The code chunk below does this but uses our smaller file as input for efficiency. The result should be all unique genotypes in that file. What did we do wrong? I get the same result when running each command through the terminals 3, 4, & 5. It seems the code chunk is fine. However you may mean we need to find a way to eliminate -- as a genotype.  
 
 ```{bash, engine.opts='-l'}
 cut -f 4 ~/MBB243/genotype_head.txt | sort | uniq
@@ -96,7 +98,7 @@ cut -f 4 ~/MBB243/genotype_head.txt | sort | uniq
 # then try running each set of commands before the pipe, e.g. uncomment the line below and re-run this chunk. What is the output?  
 #This is probably easier to do at the terminal instead of in the Rmarkdown
 # cut -f 4 ~/MBB243/genotype_head.txt | sort 
-# cut -f 4 ~/MBB243/genotype_head.txt 
+# cut -f 4 ~/MBB243/genotype_head.txt
 ```
 
 ## Setting the value of a variable
@@ -129,13 +131,14 @@ Many things you do in the bash terminal are "one-off" commands that wouldn't mak
 
 **Task:**
 
-Run the following code chunk once then use the RStudio terminal (not the Console) to find and view the contents of that file. If you have already "knit" the document then the code has been run. The `cat` command will dump the contents of any file to your terminal and is a convenient way to look at the contents of a file. For larger files, it's better to use either `head` to view the first few lines or `tail` to view the last few. What changes in the file if you manually run the code chunk a few more times?
+Run the following code chunk once then use the RStudio terminal (not the Console) to find and view the contents of that file. If you have already "knit" the document then the code has been run. The `cat` command will dump the contents of any file to your terminal and is a convenient way to look at the contents of a file. For larger files, it's better to use either `head` to view the first few lines or `tail` to view the last few. What changes in the file if you manually run the code chunk a few more times? The output is directed to Empty.txt many times.
 
 ```{bash}
 echo "Hello terminal!" >> EMPTY.txt
 echo $(date) >> EMPTY.txt
 # The redirect operators > and >> are related but have different effects on existing files. It's important that you know the difference. 
-# If you aren't clear, go back to the earlier portion of this document that introduces it and/or ask the TA or instructor. 
+# If you aren't clear, go back to the earlier portion of this document that introduces it and/or ask the TA or instructor.
+cat EMPTY.txt
 ```
 
 **Task:**
@@ -152,7 +155,10 @@ Be careful here with the distinction between `>` and `>>`. The code should only 
 
 `cat ~/.bash_profile`
 
-**DELETE THIS TEXT AND PUT YOUR NEW CODE CHUNK HERE**
+```{bash}
+echo -e "source ~/.bashrc\nDATA=local-scratch/course_files/MBB243" > ~/.bash_profile
+cat ~/.bash_profile
+```
 
 ## Setting a variable in R
 
@@ -162,17 +168,24 @@ All programming languages has variables. R has a much more complex (and useful) 
 ```{r}
 DATA="/local-scratch/course_files/MBB243/"
 print(DATA)
+```
 
+```{r}
 #do the same thing in a preferred syntax
 DATA <- "/local-scratch/course_files/MBB243/"
 print(DATA)
+```
 
+```{r}
 #get directory contents
 dir(DATA)
+```
 
+```{r}
 #store directory contents in a new variable
+DATA <- "/local-scratch/course_files/MBB243/"
 data_list = dir(DATA)
-
+data_list
 ```
 
 
@@ -185,8 +198,21 @@ There are some things we need to set up for each user that are great examples of
 Some of the software we will need later in the semester isn't installed on the server. Here we will install the miniconda package, which makes the process of installing and maintaining multiple versions of other tools relatively painless. For your bash session to be aware of software, the location of it's executable needs to be known to the environment. Bash has special variables that keep track of various important configuration. The location of available software is stored in the environment variable known as PATH. Notably, you have a ton of environment variables that are convenient shortcuts. Try adding some code below to print the contents of other environment variables such as HOME, HOSTNAME, and USER.
 
 ```{bash, engine.opts='-l'}
-echo $PATH
+echo data path is $PATH
+```
 
+```{bash, engine.opts='-l'}
+echo data path is $HOME
+echo contents of the directory:
+ls -l $HOME
+```
+
+```{bash, engine.opts='-l'}
+echo data path is $HOSTNAME
+```
+
+```{bash, engine.opts='-l'}
+echo data path is $USER
 ```
 
 **Task** 
@@ -202,7 +228,7 @@ The R language has many benefits for the analysis of data types commonly produce
 ```{r}
 #install.packages("reticulate")
 library(reticulate)
-use_python("/usr/bin/python3")
+use_python("~/miniconda3/bin/python")
 ```
 
 When we want to use Python instead of R we simply need to change the first part of the code block to specify the language. Although you can't easily tell from the example below, the code is being interpreted as Python code. The two examples below show you how switching between the two interpreters can yield different results even if the syntax is "valid" for both. 
@@ -231,17 +257,17 @@ To run Python code we always need to ensure we've loaded the `reticulate` R pack
 
 **Task** Set eval=TRUE in the two chunks below and run them (in order!).
 
-```{r, eval=FALSE}
+```{r, eval=TRUE}
 library(reticulate)
-use_python("miniconda3/bin/python")
+use_python("~/miniconda3/bin/python")
 use_condaenv("base")
 
 ```
 
 The next code block simply prints the path to the python executable that is used and then loads and tests some functionality provided by the BioPython library. 
 
-```{python, eval=FALSE}
-
+```{python, eval=TRUE}
+import sys
 sys.executable
 from Bio.Seq import Seq
 my_seq = Seq("AGTACACTGGT")
@@ -277,3 +303,4 @@ At the end of every lab, replace TODO with DONE to the left of each task to indi
 |TODO| Miniconda is installed|
 |TODO| I was able to install both Bioconda and samtools using conda|
 |TODO| The last few code chunks that run Python code run without errors when I knit this document|
+
